@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import path, {dirname} from 'path';
+import {fileURLToPath} from 'url';
+import {Page} from 'puppeteer';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({path: [path.join(__dirname, '../.mou.env')]});
@@ -5,11 +10,6 @@ dotenv.config({path: [path.join(__dirname, '../.mou.env')]});
 const LOGIN_URL = "https://moumn.org/cgi-bin/login.pl";
 const MOU_USERNAME = process.env.MOU_USERNAME || '';
 const MOU_PASSWORD = process.env.MOU_PASSWORD || '';
-
-import dotenv from 'dotenv';
-import path, {dirname} from 'path';
-import {fileURLToPath} from 'url';
-import {Page} from 'puppeteer';
 
 export async function loginMou(page: Page) {
     validateEnv();
@@ -44,6 +44,7 @@ export async function logoutMou(page: Page) {
     }
     await page.browserContext().deleteCookie(authCookie);
     console.log('MOU logout successful');
+    process.exit(0);
 }
 
 async function getAuthCookie(page: Page) {
