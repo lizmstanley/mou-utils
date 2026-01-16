@@ -17,10 +17,11 @@ Those that some technical/programming experience will likely have an easier time
 2. Install NVM (Node Version Manager), see https://github.com/nvm-sh/nvm
     1. Some easier instructions (for Linux/Mac/Windows)
        here: https://www.freecodecamp.org/news/node-version-manager-nvm-install-guide/
-3. At a terminal in this (`mou-data`) directory, execute `nvm install $(cat .nvmrc)` to install the correct Node version
+1. Change into the `mou-data` directory
+3. At a terminal in the `mou-data` directory, execute `nvm install $(cat .nvmrc)` to install the correct Node version
 4. `nvm use` to switch to that Node version
 5. Run `npm install` to install the project dependencies
-6. Copy the sample general .env file: `cp mou-data/sample.mou.env .mou.env`
+6. Copy the sample general .env file: `cp sample.mou.env .mou.env`
 7. Edit the `.mou.env` file with your MOU login credentials.
 
 ### RQD Data Script
