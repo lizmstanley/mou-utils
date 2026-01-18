@@ -18,10 +18,18 @@ if [[ $poetry_command_exists -ne 0 || $poetry_installed_for_active_python -ne 0 
   echo "Poetry not found, installing..."
   pip install poetry
 fi
+# shellcheck disable=SC2002
 cat .python-version | xargs pyenv install
 python -m venv ./.venv && source ./.venv/bin/activate
 poetry lock && poetry install
 if ! [ -f .env ]; then
   echo ".env file not found, copying sample.env to .env"
   cp sample.env .env
+  echo "Please edit the .env file with appropriate values."
 fi
+# These hooks will update dependencies and rebuild code in the Node app
+# anytime a change is pulled, so it doesn't have to be done manually.
+echo "Setting up Git hooks..."
+git config --local core.hooksPath scripts/git_hooks
+git_hooks/post-merge
+echo "Setup complete."
