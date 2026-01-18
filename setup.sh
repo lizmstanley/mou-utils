@@ -49,4 +49,4 @@ fi
 echo "Setting up Git hooks..."
 git config --local core.hooksPath scripts/git_hooks
 ./scripts/node-install-build.sh
-echo "Setup complete."
+echo "Setup complete. Make sure you edit the .env file with your MOU credentials."
