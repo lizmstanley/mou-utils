@@ -1,11 +1,7 @@
 import dotenv from 'dotenv';
-import path, {dirname} from 'path';
-import {fileURLToPath} from 'url';
 import {Page} from 'puppeteer';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({path: [path.join(__dirname, '../.mou.env')]});
+dotenv.config();
 
 const LOGIN_URL = "https://moumn.org/cgi-bin/login.pl";
 const MOU_USERNAME = process.env.MOU_USERNAME || '';

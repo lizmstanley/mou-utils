@@ -14,12 +14,12 @@ import {format, parseISO} from "date-fns";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({path: [path.join(__dirname, '../.mou.env')]});
 
 const RQD_PAGE = "https://moumn.org/cgi-bin/rqd.pl?op=rare&sort=";
 
 interface ProcessRqdOptions {
     sinceDate: Date;
+    outFilePath?: string;
 }
 
 export type RqdRecord = {
@@ -33,17 +33,21 @@ export type RqdRecord = {
     email: string
 }
 
-export async function main(sinceDate: Date) {
+export async function main(args: ProcessRqdOptions) {
+    console.log(args);
     const page = await launchBrowser();
     await loginMou(page);
     await navigateToRqdPage(page);
-    const outFile = `rqd-records-${format(sinceDate, 'yyyy-MM-dd')}.csv`;
+    const outFile = `rqd-records-${format(args.sinceDate, 'yyyy-MM-dd')}.csv`;
+    const outFilePath = args.outFilePath || path.join(__dirname, '..');
+    const fullOutPath = path.join(outFilePath, outFile);
+    console.log(`Writing RQD records to ${fullOutPath}...`);
     await pipeline(
-        Readable.from(processRqdRecords(page, sinceDate)),
+        Readable.from(processRqdRecords(page, args.sinceDate)),
         stringify({header: true}),
-        fs.createWriteStream(path.join(__dirname, '..', outFile))
+        fs.createWriteStream(path.join(outFilePath, outFile))
     );
-    console.log(`RQD records written to ${outFile}`);
+    console.log(`... done writing RQD records to ${fullOutPath}`);
     await logoutMou(page);
 }
 
@@ -109,12 +113,18 @@ const argsParser = yargs(hideBin(process.argv))
         description: 'Only process RQD records submitted after this date (YYYY-MM-DD)',
         demandOption: true
     })
-    .example('tsx mou-data/$0 --d 2026-01-01', 'Process RQD records submitted after January 1, 2026')
-    .example('npm run rqd-data -- -d 2026-01-01', 'Process RQD records submitted after January 1, 2026')
+    .option('out-file-path', {
+        alias: "o",
+        type: "string",
+        description: 'Output file path for the CSV file',
+        demandOption: false
+    })
+    .example('tsx mou_data_node/$0 --d 2026-01-01', 'Process RQD records submitted after January 1, 2026')
+    .example('npm run rqd-data -- -d 2026-01-01 -o /some/directory', 'Process RQD records submitted after January 1, 2026 and output the result csv file to /some/directory')
     .coerce('since-date', (arg) => parseISO(arg));
 
 (async () => {
     const args = argsParser.parse(hideBin(process.argv)) as ProcessRqdOptions;
     console.log(`Processing RQD records submitted after ${args.sinceDate}`);
-    await main(args.sinceDate);
+    await main(args);
 })();
