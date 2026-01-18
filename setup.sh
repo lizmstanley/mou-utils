@@ -31,5 +31,5 @@ fi
 # anytime a change is pulled, so it doesn't have to be done manually.
 echo "Setting up Git hooks..."
 git config --local core.hooksPath scripts/git_hooks
-git_hooks/post-merge
+./scripts/node-install-build.sh
 echo "Setup complete."

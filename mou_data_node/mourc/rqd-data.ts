@@ -34,7 +34,6 @@ export type RqdRecord = {
 }
 
 export async function main(args: ProcessRqdOptions) {
-    console.log(args);
     const page = await launchBrowser();
     await loginMou(page);
     await navigateToRqdPage(page);
