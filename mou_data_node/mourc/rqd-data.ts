@@ -5,7 +5,6 @@ import yargs from 'yargs';
 import {hideBin} from "yargs/helpers";
 import {fileURLToPath} from "url";
 import path, {dirname} from "path";
-import dotenv from "dotenv";
 import {Readable} from "node:stream";
 import { stringify } from "csv-stringify";
 import {pipeline} from 'node:stream/promises';
@@ -41,6 +40,7 @@ export async function main(args: ProcessRqdOptions) {
     const outFilePath = args.outFilePath || path.join(__dirname, '..');
     const fullOutPath = path.join(outFilePath, outFile);
     console.log(`Writing RQD records to ${fullOutPath}...`);
+    // Leverage Node.js transform streams to handle potentially large data sets without running out of memory
     await pipeline(
         Readable.from(processRqdRecords(page, args.sinceDate)),
         stringify({header: true}),
@@ -61,7 +61,10 @@ async function navigateToRqdPage(page: Page) {
     console.log('RQD page loaded successfully');
 }
 
-// Async generator to process RQD records one by one. Avoids memory issues and we can use it to stream to CSV.
+// This function creates an async generator to process RQD records one by one. This avoids memory
+// issues, and we can use it to stream to CSV. The approach is to grab all the RQD record links
+// from the table. This is much quicker than looping through each row and doing the actual
+// click action on each link. We can simply navigate to each link directly.
 async function* processRqdRecords(page: Page, sinceDate: Date) {
     const links = await page.$$eval("#table_results tr td a", els => els.map(el => el.href));
 
